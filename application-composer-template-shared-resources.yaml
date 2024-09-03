@@ -1,0 +1,631 @@
+Resources:
+  vpcA2121C38:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.0.0.0/16
+      EnableDnsHostnames: true
+      EnableDnsSupport: true
+      InstanceTenancy: default
+      Tags:
+        - Key: Name
+          Value: shared-resources/vpc
+    Metadata:
+      aws:cdk:path: shared-resources/vpc/Resource
+  vpcipv6cidr41CEB63E:
+    Type: AWS::EC2::VPCCidrBlock
+    Properties:
+      AmazonProvidedIpv6CidrBlock: true
+      VpcId: !Ref vpcA2121C38
+    Metadata:
+      aws:cdk:path: shared-resources/vpc/ipv6cidr
+  vpcPublicSubnet1Subnet2E65531E:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AssignIpv6AddressOnCreation: true
+      AvailabilityZone: !Select
+        - 0
+        - !GetAZs ''
+      CidrBlock: 10.0.0.0/18
+      Ipv6CidrBlock: !Select
+        - 0
+        - !Cidr
+          - !Select
+            - 0
+            - !GetAtt vpcA2121C38.Ipv6CidrBlocks
+          - 4
+          - '64'
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: aws-cdk:subnet-name
+          Value: Public
+        - Key: aws-cdk:subnet-type
+          Value: Public
+        - Key: Name
+          Value: shared-resources/vpc/PublicSubnet1
+      VpcId: !Ref vpcA2121C38
+    DependsOn:
+      - vpcipv6cidr41CEB63E
+    Metadata:
+      aws:cdk:path: shared-resources/vpc/PublicSubnet1/Subnet
+  vpcPublicSubnet1RouteTable48A2DF9B:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      Tags:
+        - Key: Name
+          Value: shared-resources/vpc/PublicSubnet1
+      VpcId: !Ref vpcA2121C38
+    DependsOn:
+      - vpcipv6cidr41CEB63E
+    Metadata:
+      aws:cdk:path: shared-resources/vpc/PublicSubnet1/RouteTable
+  vpcPublicSubnet1RouteTableAssociation5D3F4579:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref vpcPublicSubnet1RouteTable48A2DF9B
+      SubnetId: !Ref vpcPublicSubnet1Subnet2E65531E
+    DependsOn:
+      - vpcipv6cidr41CEB63E
+    Metadata:
+      aws:cdk:path: shared-resources/vpc/PublicSubnet1/RouteTableAssociation
+  vpcPublicSubnet1DefaultRoute10708846:
+    Type: AWS::EC2::Route
+    Properties:
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref vpcIGWE57CBDCA
+      RouteTableId: !Ref vpcPublicSubnet1RouteTable48A2DF9B
+    DependsOn:
+      - vpcipv6cidr41CEB63E
+      - vpcVPCGW7984C166
+    Metadata:
+      aws:cdk:path: shared-resources/vpc/PublicSubnet1/DefaultRoute
+  vpcPublicSubnet1DefaultRoute6B917451A:
+    Type: AWS::EC2::Route
+    Properties:
+      DestinationIpv6CidrBlock: '::/0'
+      GatewayId: !Ref vpcIGWE57CBDCA
+      RouteTableId: !Ref vpcPublicSubnet1RouteTable48A2DF9B
+    DependsOn:
+      - vpcipv6cidr41CEB63E
+    Metadata:
+      aws:cdk:path: shared-resources/vpc/PublicSubnet1/DefaultRoute6
+  vpcPublicSubnet1EIPDA49DCBE:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+      Tags:
+        - Key: Name
+          Value: shared-resources/vpc/PublicSubnet1
+    DependsOn:
+      - vpcipv6cidr41CEB63E
+    Metadata:
+      aws:cdk:path: shared-resources/vpc/PublicSubnet1/EIP
+  vpcPublicSubnet1NATGateway9C16659E:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      AllocationId: !GetAtt vpcPublicSubnet1EIPDA49DCBE.AllocationId
+      SubnetId: !Ref vpcPublicSubnet1Subnet2E65531E
+      Tags:
+        - Key: Name
+          Value: shared-resources/vpc/PublicSubnet1
+    DependsOn:
+      - vpcipv6cidr41CEB63E
+      - vpcPublicSubnet1DefaultRoute10708846
+      - vpcPublicSubnet1DefaultRoute6B917451A
+      - vpcPublicSubnet1RouteTableAssociation5D3F4579
+    Metadata:
+      aws:cdk:path: shared-resources/vpc/PublicSubnet1/NATGateway
+  vpcPublicSubnet2Subnet009B674F:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AssignIpv6AddressOnCreation: true
+      AvailabilityZone: !Select
+        - 1
+        - !GetAZs ''
+      CidrBlock: 10.0.64.0/18
+      Ipv6CidrBlock: !Select
+        - 1
+        - !Cidr
+          - !Select
+            - 0
+            - !GetAtt vpcA2121C38.Ipv6CidrBlocks
+          - 4
+          - '64'
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: aws-cdk:subnet-name
+          Value: Public
+        - Key: aws-cdk:subnet-type
+          Value: Public
+        - Key: Name
+          Value: shared-resources/vpc/PublicSubnet2
+      VpcId: !Ref vpcA2121C38
+    DependsOn:
+      - vpcipv6cidr41CEB63E
+    Metadata:
+      aws:cdk:path: shared-resources/vpc/PublicSubnet2/Subnet
+  vpcPublicSubnet2RouteTableEB40D4CB:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      Tags:
+        - Key: Name
+          Value: shared-resources/vpc/PublicSubnet2
+      VpcId: !Ref vpcA2121C38
+    DependsOn:
+      - vpcipv6cidr41CEB63E
+    Metadata:
+      aws:cdk:path: shared-resources/vpc/PublicSubnet2/RouteTable
+  vpcPublicSubnet2RouteTableAssociation21F81B59:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref vpcPublicSubnet2RouteTableEB40D4CB
+      SubnetId: !Ref vpcPublicSubnet2Subnet009B674F
+    DependsOn:
+      - vpcipv6cidr41CEB63E
+    Metadata:
+      aws:cdk:path: shared-resources/vpc/PublicSubnet2/RouteTableAssociation
+  vpcPublicSubnet2DefaultRouteA1EC0F60:
+    Type: AWS::EC2::Route
+    Properties:
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref vpcIGWE57CBDCA
+      RouteTableId: !Ref vpcPublicSubnet2RouteTableEB40D4CB
+    DependsOn:
+      - vpcipv6cidr41CEB63E
+      - vpcVPCGW7984C166
+    Metadata:
+      aws:cdk:path: shared-resources/vpc/PublicSubnet2/DefaultRoute
+  vpcPublicSubnet2DefaultRoute6B6505D81:
+    Type: AWS::EC2::Route
+    Properties:
+      DestinationIpv6CidrBlock: '::/0'
+      GatewayId: !Ref vpcIGWE57CBDCA
+      RouteTableId: !Ref vpcPublicSubnet2RouteTableEB40D4CB
+    DependsOn:
+      - vpcipv6cidr41CEB63E
+    Metadata:
+      aws:cdk:path: shared-resources/vpc/PublicSubnet2/DefaultRoute6
+  vpcPublicSubnet2EIP9B3743B1:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+      Tags:
+        - Key: Name
+          Value: shared-resources/vpc/PublicSubnet2
+    DependsOn:
+      - vpcipv6cidr41CEB63E
+    Metadata:
+      aws:cdk:path: shared-resources/vpc/PublicSubnet2/EIP
+  vpcPublicSubnet2NATGateway9B8AE11A:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      AllocationId: !GetAtt vpcPublicSubnet2EIP9B3743B1.AllocationId
+      SubnetId: !Ref vpcPublicSubnet2Subnet009B674F
+      Tags:
+        - Key: Name
+          Value: shared-resources/vpc/PublicSubnet2
+    DependsOn:
+      - vpcipv6cidr41CEB63E
+      - vpcPublicSubnet2DefaultRouteA1EC0F60
+      - vpcPublicSubnet2DefaultRoute6B6505D81
+      - vpcPublicSubnet2RouteTableAssociation21F81B59
+    Metadata:
+      aws:cdk:path: shared-resources/vpc/PublicSubnet2/NATGateway
+  vpcPrivateSubnet1Subnet934893E8:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AssignIpv6AddressOnCreation: true
+      AvailabilityZone: !Select
+        - 0
+        - !GetAZs ''
+      CidrBlock: 10.0.128.0/18
+      Ipv6CidrBlock: !Select
+        - 2
+        - !Cidr
+          - !Select
+            - 0
+            - !GetAtt vpcA2121C38.Ipv6CidrBlocks
+          - 4
+          - '64'
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: aws-cdk:subnet-name
+          Value: Private
+        - Key: aws-cdk:subnet-type
+          Value: Private
+        - Key: Name
+          Value: shared-resources/vpc/PrivateSubnet1
+      VpcId: !Ref vpcA2121C38
+    DependsOn:
+      - vpcipv6cidr41CEB63E
+    Metadata:
+      aws:cdk:path: shared-resources/vpc/PrivateSubnet1/Subnet
+  vpcPrivateSubnet1RouteTableB41A48CC:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      Tags:
+        - Key: Name
+          Value: shared-resources/vpc/PrivateSubnet1
+      VpcId: !Ref vpcA2121C38
+    DependsOn:
+      - vpcipv6cidr41CEB63E
+    Metadata:
+      aws:cdk:path: shared-resources/vpc/PrivateSubnet1/RouteTable
+  vpcPrivateSubnet1RouteTableAssociation67945127:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref vpcPrivateSubnet1RouteTableB41A48CC
+      SubnetId: !Ref vpcPrivateSubnet1Subnet934893E8
+    DependsOn:
+      - vpcipv6cidr41CEB63E
+    Metadata:
+      aws:cdk:path: shared-resources/vpc/PrivateSubnet1/RouteTableAssociation
+  vpcPrivateSubnet1DefaultRoute1AA8E2E5:
+    Type: AWS::EC2::Route
+    Properties:
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId: !Ref vpcPublicSubnet1NATGateway9C16659E
+      RouteTableId: !Ref vpcPrivateSubnet1RouteTableB41A48CC
+    DependsOn:
+      - vpcipv6cidr41CEB63E
+    Metadata:
+      aws:cdk:path: shared-resources/vpc/PrivateSubnet1/DefaultRoute
+  vpcPrivateSubnet1DefaultRoute65ED7B7AA:
+    Type: AWS::EC2::Route
+    Properties:
+      DestinationIpv6CidrBlock: '::/0'
+      EgressOnlyInternetGatewayId: !Ref vpcEIGW693EAFBD1
+      RouteTableId: !Ref vpcPrivateSubnet1RouteTableB41A48CC
+    DependsOn:
+      - vpcipv6cidr41CEB63E
+    Metadata:
+      aws:cdk:path: shared-resources/vpc/PrivateSubnet1/DefaultRoute6
+  vpcPrivateSubnet2Subnet7031C2BA:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AssignIpv6AddressOnCreation: true
+      AvailabilityZone: !Select
+        - 1
+        - !GetAZs ''
+      CidrBlock: 10.0.192.0/18
+      Ipv6CidrBlock: !Select
+        - 3
+        - !Cidr
+          - !Select
+            - 0
+            - !GetAtt vpcA2121C38.Ipv6CidrBlocks
+          - 4
+          - '64'
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: aws-cdk:subnet-name
+          Value: Private
+        - Key: aws-cdk:subnet-type
+          Value: Private
+        - Key: Name
+          Value: shared-resources/vpc/PrivateSubnet2
+      VpcId: !Ref vpcA2121C38
+    DependsOn:
+      - vpcipv6cidr41CEB63E
+    Metadata:
+      aws:cdk:path: shared-resources/vpc/PrivateSubnet2/Subnet
+  vpcPrivateSubnet2RouteTable7280F23E:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      Tags:
+        - Key: Name
+          Value: shared-resources/vpc/PrivateSubnet2
+      VpcId: !Ref vpcA2121C38
+    DependsOn:
+      - vpcipv6cidr41CEB63E
+    Metadata:
+      aws:cdk:path: shared-resources/vpc/PrivateSubnet2/RouteTable
+  vpcPrivateSubnet2RouteTableAssociation007E94D3:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref vpcPrivateSubnet2RouteTable7280F23E
+      SubnetId: !Ref vpcPrivateSubnet2Subnet7031C2BA
+    DependsOn:
+      - vpcipv6cidr41CEB63E
+    Metadata:
+      aws:cdk:path: shared-resources/vpc/PrivateSubnet2/RouteTableAssociation
+  vpcPrivateSubnet2DefaultRouteB0E07F99:
+    Type: AWS::EC2::Route
+    Properties:
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId: !Ref vpcPublicSubnet2NATGateway9B8AE11A
+      RouteTableId: !Ref vpcPrivateSubnet2RouteTable7280F23E
+    DependsOn:
+      - vpcipv6cidr41CEB63E
+    Metadata:
+      aws:cdk:path: shared-resources/vpc/PrivateSubnet2/DefaultRoute
+  vpcPrivateSubnet2DefaultRoute652E2B1E6:
+    Type: AWS::EC2::Route
+    Properties:
+      DestinationIpv6CidrBlock: '::/0'
+      EgressOnlyInternetGatewayId: !Ref vpcEIGW693EAFBD1
+      RouteTableId: !Ref vpcPrivateSubnet2RouteTable7280F23E
+    DependsOn:
+      - vpcipv6cidr41CEB63E
+    Metadata:
+      aws:cdk:path: shared-resources/vpc/PrivateSubnet2/DefaultRoute6
+  vpcIGWE57CBDCA:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: shared-resources/vpc
+    Metadata:
+      aws:cdk:path: shared-resources/vpc/IGW
+  vpcVPCGW7984C166:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      InternetGatewayId: !Ref vpcIGWE57CBDCA
+      VpcId: !Ref vpcA2121C38
+    Metadata:
+      aws:cdk:path: shared-resources/vpc/VPCGW
+  vpcEIGW693EAFBD1:
+    Type: AWS::EC2::EgressOnlyInternetGateway
+    Properties:
+      VpcId: !Ref vpcA2121C38
+    Metadata:
+      aws:cdk:path: shared-resources/vpc/EIGW6
+  cluster611F8AFF:
+    Type: AWS::ECS::Cluster
+    Metadata:
+      aws:cdk:path: shared-resources/cluster/Resource
+  nlbC39469D4:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      IpAddressType: dualstack
+      LoadBalancerAttributes:
+        - Key: deletion_protection.enabled
+          Value: 'false'
+      Scheme: internet-facing
+      SubnetMappings:
+        - AllocationId: !GetAtt nlbeipPublicSubnet1.AllocationId
+          SubnetId: !Ref vpcPublicSubnet1Subnet2E65531E
+        - AllocationId: !GetAtt nlbeipPublicSubnet2.AllocationId
+          SubnetId: !Ref vpcPublicSubnet2Subnet009B674F
+      Type: network
+    DependsOn:
+      - vpcPublicSubnet1DefaultRoute10708846
+      - vpcPublicSubnet1DefaultRoute6B917451A
+      - vpcPublicSubnet1RouteTableAssociation5D3F4579
+      - vpcPublicSubnet2DefaultRouteA1EC0F60
+      - vpcPublicSubnet2DefaultRoute6B6505D81
+      - vpcPublicSubnet2RouteTableAssociation21F81B59
+    Metadata:
+      aws:cdk:path: shared-resources/nlb/Resource
+  nlblistener1E6F8561:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      DefaultActions:
+        - TargetGroupArn: !Ref nlblisteneralbtargetGroup1A1FEEE8
+          Type: forward
+      LoadBalancerArn: !Ref nlbC39469D4
+      Port: 80
+      Protocol: TCP
+    Metadata:
+      aws:cdk:path: shared-resources/nlb/listener/Resource
+  nlblisteneralbtargetGroup1A1FEEE8:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Port: 80
+      Protocol: TCP
+      TargetType: alb
+      Targets:
+        - Id: !Ref alb8A8B13C2
+          Port: 80
+      VpcId: !Ref vpcA2121C38
+    Metadata:
+      aws:cdk:path: shared-resources/nlb/listener/alb-targetGroup/Resource
+  nlbeipPublicSubnet1:
+    Type: AWS::EC2::EIP
+    Metadata:
+      aws:cdk:path: shared-resources/nlb-eip-PublicSubnet1
+  nlbeipPublicSubnet2:
+    Type: AWS::EC2::EIP
+    Metadata:
+      aws:cdk:path: shared-resources/nlb-eip-PublicSubnet2
+  alb8A8B13C2:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      LoadBalancerAttributes:
+        - Key: deletion_protection.enabled
+          Value: 'false'
+      Scheme: internal
+      SecurityGroups:
+        - !GetAtt albSecurityGroup49866104.GroupId
+      Subnets:
+        - !Ref vpcPrivateSubnet1Subnet934893E8
+        - !Ref vpcPrivateSubnet2Subnet7031C2BA
+      Type: application
+    Metadata:
+      aws:cdk:path: shared-resources/alb/Resource
+  albSecurityGroup49866104:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Automatically created Security Group for ELB sharedresourcesalbBEE3B201
+      SecurityGroupIngress:
+        - CidrIp: 0.0.0.0/0
+          Description: Allow from anyone on port 80
+          FromPort: 80
+          IpProtocol: tcp
+          ToPort: 80
+      VpcId: !Ref vpcA2121C38
+    Metadata:
+      aws:cdk:path: shared-resources/alb/SecurityGroup/Resource
+  alblistenerC508FBF5:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      DefaultActions:
+        - FixedResponseConfig:
+            ContentType: text/plain
+            MessageBody: OK
+            StatusCode: '200'
+          Type: fixed-response
+      LoadBalancerArn: !Ref alb8A8B13C2
+      Port: 80
+      Protocol: HTTP
+    Metadata:
+      aws:cdk:path: shared-resources/alb/listener/Resource
+  alblistenerservicetargetGroup35E4CEC9:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      HealthCheckIntervalSeconds: 10
+      HealthCheckPath: /
+      HealthCheckTimeoutSeconds: 5
+      Port: 80
+      Protocol: HTTP
+      TargetGroupAttributes:
+        - Key: deregistration_delay.timeout_seconds
+          Value: '10'
+        - Key: stickiness.enabled
+          Value: 'false'
+      TargetType: ip
+      VpcId: !Ref vpcA2121C38
+    Metadata:
+      aws:cdk:path: shared-resources/alb/listener/service-targetGroup/Resource
+  alblistenerservicetargetRuleAC5196F6:
+    Type: AWS::ElasticLoadBalancingV2::ListenerRule
+    Properties:
+      Actions:
+        - TargetGroupArn: !Ref alblistenerservicetargetGroup35E4CEC9
+          Type: forward
+      Conditions:
+        - Field: path-pattern
+          PathPatternConfig:
+            Values:
+              - '*'
+      ListenerArn: !Ref alblistenerC508FBF5
+      Priority: 1
+    Metadata:
+      aws:cdk:path: shared-resources/alb/listener/service-targetRule/Resource
+  CDKMetadata:
+    Type: AWS::CDK::Metadata
+    Properties:
+      Analytics: v2:deflate64:H4sIAAAAAAAA/3VSTW/CMAz9LbuXbHCYdoUKIaQJqoK4TmnqgSEkVeKAUNX/PvdrLZN28vN7z0+Wk5mYzt7F24u8+4nKLxONmSh3JNUlYuqrBDUT5aFQUfxtDknclRhzt9CWTUnINKpdyAxQLQ4otYFgLzMNAz9wc++tQkloza+5Bst1UpeNpJUkuMtHlDi8MRyC14bAMe4N7UpdNyfe/XQF01iXRwfeb41+/B3agQoO6bFyNhTNgmOiikB5UcY6eB6r5Q6yoKUnVNrKPJNaGoXmeOMbbYDu1l0+mV80fDv31Pce5CjT6T3utL10R96y32rczouCT92c7Cl1zPdpI+6/iM6ahvaBxn1VRSl4G5xqpG2gIrRvOmJja3Ksk6rI2BzE2b/eph/8nfg3nT3ixAVDeAWRtvUHwish0moCAAA=
+    Metadata:
+      aws:cdk:path: shared-resources/CDKMetadata/Default
+    Condition: CDKMetadataAvailable
+Outputs:
+  dns:
+    Value: !GetAtt nlbC39469D4.DNSName
+  ExportsOutputRefcluster611F8AFFA07FC079:
+    Value: !Ref cluster611F8AFF
+    Export:
+      Name: shared-resources:ExportsOutputRefcluster611F8AFFA07FC079
+  ExportsOutputRefalblistenerservicetargetGroup35E4CEC965E6E49F:
+    Value: !Ref alblistenerservicetargetGroup35E4CEC9
+    Export:
+      Name: shared-resources:ExportsOutputRefalblistenerservicetargetGroup35E4CEC965E6E49F
+  ExportsOutputRefvpcPrivateSubnet1Subnet934893E8236E2271:
+    Value: !Ref vpcPrivateSubnet1Subnet934893E8
+    Export:
+      Name: shared-resources:ExportsOutputRefvpcPrivateSubnet1Subnet934893E8236E2271
+  ExportsOutputRefvpcPrivateSubnet2Subnet7031C2BA60DCB1EE:
+    Value: !Ref vpcPrivateSubnet2Subnet7031C2BA
+    Export:
+      Name: shared-resources:ExportsOutputRefvpcPrivateSubnet2Subnet7031C2BA60DCB1EE
+  ExportsOutputRefvpcA2121C384D1B3CDE:
+    Value: !Ref vpcA2121C38
+    Export:
+      Name: shared-resources:ExportsOutputRefvpcA2121C384D1B3CDE
+  ExportsOutputFnGetAttalbSecurityGroup49866104GroupIdD5B19856:
+    Value: !GetAtt albSecurityGroup49866104.GroupId
+    Export:
+      Name: shared-resources:ExportsOutputFnGetAttalbSecurityGroup49866104GroupIdD5B19856
+Conditions:
+  CDKMetadataAvailable: !Or
+    - !Or
+      - !Equals
+        - !Ref AWS::Region
+        - af-south-1
+      - !Equals
+        - !Ref AWS::Region
+        - ap-east-1
+      - !Equals
+        - !Ref AWS::Region
+        - ap-northeast-1
+      - !Equals
+        - !Ref AWS::Region
+        - ap-northeast-2
+      - !Equals
+        - !Ref AWS::Region
+        - ap-south-1
+      - !Equals
+        - !Ref AWS::Region
+        - ap-southeast-1
+      - !Equals
+        - !Ref AWS::Region
+        - ap-southeast-2
+      - !Equals
+        - !Ref AWS::Region
+        - ca-central-1
+      - !Equals
+        - !Ref AWS::Region
+        - cn-north-1
+      - !Equals
+        - !Ref AWS::Region
+        - cn-northwest-1
+    - !Or
+      - !Equals
+        - !Ref AWS::Region
+        - eu-central-1
+      - !Equals
+        - !Ref AWS::Region
+        - eu-north-1
+      - !Equals
+        - !Ref AWS::Region
+        - eu-south-1
+      - !Equals
+        - !Ref AWS::Region
+        - eu-west-1
+      - !Equals
+        - !Ref AWS::Region
+        - eu-west-2
+      - !Equals
+        - !Ref AWS::Region
+        - eu-west-3
+      - !Equals
+        - !Ref AWS::Region
+        - il-central-1
+      - !Equals
+        - !Ref AWS::Region
+        - me-central-1
+      - !Equals
+        - !Ref AWS::Region
+        - me-south-1
+      - !Equals
+        - !Ref AWS::Region
+        - sa-east-1
+    - !Or
+      - !Equals
+        - !Ref AWS::Region
+        - us-east-1
+      - !Equals
+        - !Ref AWS::Region
+        - us-east-2
+      - !Equals
+        - !Ref AWS::Region
+        - us-west-1
+      - !Equals
+        - !Ref AWS::Region
+        - us-west-2
+Parameters:
+  BootstrapVersion:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: /cdk-bootstrap/hnb659fds/version
+    Description: Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]
+Rules:
+  CheckBootstrapVersion:
+    Assertions:
+      - Assert: !Not
+          - !Contains
+            - - '1'
+              - '2'
+              - '3'
+              - '4'
+              - '5'
+            - !Ref BootstrapVersion
+        AssertDescription: CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI.
